@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input to Array Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #121212;
+            color: #A8D5BA;
+        }
+        textarea {
+            width: 80%;
+            flex: 1;
+            margin: 5px 0;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #3E885B;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #1E1E1E;
+            color: #A8D5BA;
+            resize: none;
+        }
+        textarea::placeholder {
+            color: #5F8C69;
+        }
+        textarea:focus {
+            outline: 2px solid #3E885B;
+        }
+        h1 {
+            margin: 10px 0;
+        }
+    </style>
+</head> 
+<body>
+    <h1>Automate "App start inspect" to "Extras" parameters converter</h1>
+    <textarea id="input" placeholder="Enter your input here..."></textarea>
+    <textarea id="output" placeholder="Output will appear here..." readonly></textarea>
+
+    <script>
+        function convertInput() {
+            const input = document.getElementById('input').value;
+            const extrasLine = input.split('\n').find(line => line.startsWith('• Extras:'));
+
+            if (!extrasLine) {
+                document.getElementById('output').value = 'No Extras field found in input';
+                return;
+            }
+
+            const extras = extrasLine.replace('• Extras:', '').trim();
+            const params = extras.split(',').map(param => {
+                const match = param.match(/^(.*?)\s(as\s\w+):\s(.*)$/);
+                if (match) {
+                    const [, key, type, value] = match;
+                    return `"${key.trim()}" ${type.trim()}: "${value.trim()}"`;
+                }
+                return null;
+            }).filter(param => param).join(', ');
+
+            document.getElementById('output').value = `{${params}}`;
+        }
+
+        document.getElementById('input').addEventListener('input', convertInput);
+    </script>
+</body>
+</html>
